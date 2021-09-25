@@ -8,6 +8,6 @@ projects:
     libs:
       - src: skymin/json/JsonData
         version: ^SKY
-      - src: skymin/traits/pmmp-SimpleTrai
+      - src: skymin/traits/pmmp-SimpleTrait
         version: ^SKY
 ...
