@@ -6,7 +6,7 @@ projects:
   MoneyAPI:
     path: MoneyAPI/
     libs:
-      - src: 	skymin\json/JsonData
+      - src: skymin\json/JsonData
         version: ^SKY
       - src: skymin/traits/pmmp-SimpleTrait
         version: ^SKY
