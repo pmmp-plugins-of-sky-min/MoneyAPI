@@ -10,6 +10,8 @@ use pocketmine\Server;
 
 use pocketmine\scheduler\ClosureTask;
 
+use pocketmine\utils\SingletonTrait;
+
 use skymin\money\event\{
 	MoneyChangedEvent,
 	MoneyAddEvent,
@@ -27,7 +29,6 @@ use skymin\money\command\{
 };
 
 use skymin\json\Data;
-use skymin\traits\{SingletonTrait, NameTrait};
 
 use function floor;
 use function count;
@@ -35,7 +36,7 @@ use function implode;
 use function arsort;
 
 class MoneyAPI extends PluginBase{
-	use SingletonTrait, NameTrait;
+	use SingletonTrait;
 	
 	public static string $unit = '원';
 	public static int $defaultMoney = 50000;
@@ -65,6 +66,14 @@ class MoneyAPI extends PluginBase{
 	
 	public function onDisable() :void{
 		Data::save($this->getDataFolder(), 'data', $this->data);
+	}
+	
+	private function getLowerCaseName($player) :string{
+		return $player instanceof Player ? strtolower($player->getName()) : strtolower($player);
+	}
+	
+	private function getPlayer($player) :Player{
+		return $player instanceof Player ? $player : Server::getInstance()->getPlayerExact($player);
 	}
 	
 	public function koreanFormat(int $money) :string{
@@ -104,22 +113,27 @@ class MoneyAPI extends PluginBase{
 	public function setMoney($p, int $money) :void{
 		if ($money < 0) $money = 0;
 		$player = $this->getLowerCaseName($p);
-		(new MoneyChangedEvent ($player, $this->getMoney($p), $money))->call();
+		$ev = new MoneyChangedEvent ($player, $this->getMoney($p), $money);
+		$ev->call();
+		if($ev->isCancelled()) return;
 		$this->data[$player] = $money;
 	}
 	
 	public function addMoney($p, int $money) :void{
 		$player = $this->getLowerCaseName($p);
-		(new MoneyAddEvent ($player, $money))->call();
+		$ev = new MoneyAddEvent ($player, $money);
+		$ev->call();
+		if($ev->isCancelled()) return;
 		$this->setMoney($p, $this->getMoney($p) + $money);
 	}
 	
-	public function reduceMoney($p, int $money) :bool{
+	public function reduceMoney($p, int $money) :void{
 		$player = $this->getLowerCaseName($p);
-		(new MoneyReduceEvent ($player, $money))->call();
-		if ($this->getMoney($p) < $money) return false;
+		$ev = new MoneyReduceEvent ($player, $money);
+		$ev->call();
+		if($ev->isCancelled()) return;
+		if ($this->getMoney($p) < $money) return;
 		$this->setMoney($p, $this->getMoney($p) - $money);
-		return true;
 	}
 	
 	public function getRank($p) :int{
