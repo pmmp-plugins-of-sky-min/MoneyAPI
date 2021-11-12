@@ -27,7 +27,7 @@ class MoneyReduceEvent extends PlayerEvent implements Cancellable{
 	use CancellableTrait;
 
 	public function __construct (
-		private Player $player,
+		private string $player,
 		private int $money
 	){}
 	

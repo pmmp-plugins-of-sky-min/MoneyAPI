@@ -143,10 +143,10 @@ class MoneyAPI extends PluginBase{
 	
 	public function reduceMoney($p, int $money) :void{
 		$player = $this->getLowerCaseName($p);
+		if($this->getMoney($p) < $money) return;
 		$ev = new MoneyReduceEvent ($player, $money);
 		$ev->call();
 		if($ev->isCancelled()) return;
-		if ($this->getMoney($p) < $money) return;
 		$this->setMoney($p, $this->getMoney($p) - $money);
 	}
 	

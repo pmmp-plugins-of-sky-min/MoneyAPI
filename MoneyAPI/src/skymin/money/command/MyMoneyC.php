@@ -20,6 +20,7 @@ namespace skymin\money\command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
+use pocketmine\player\Player;
 use skymin\money\MoneyAPI;
 
 class MyMoneyC extends Command{
@@ -31,6 +32,7 @@ class MyMoneyC extends Command{
 	}
 	
 	public function execute(CommandSender $player, string $label, array $args) :void{
+		if(!$player instanceof Player) return;
 		$api = MoneyApi::getInstance();
 		$money = $api->getMoney($player);
 		$player->sendMessage(MoneyAPI::$prefix . "나의 돈 : " . $api->koreanFormat($money));
